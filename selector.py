@@ -1,7 +1,9 @@
-#Things this should do:
-#1. Read a config file to see what shows to download and when the last show downloaded was
-#2. Go to rinse website for each of the shows
-#3. Download all undownloaded episodes
+"""
+Selector: A rinse autodownloader
+This script reads a config file, goes to the rinse website to look up the shows
+in question, then downloads new shows to a directory specified in the config
+file.
+"""
 
 import yaml
 import urllib
@@ -31,6 +33,9 @@ def get_url_date(url):
     return date(year, month, day)
 
 def get_backlog():
+    """
+    Get a list of urls of shows that have not yet been downloaded.
+    """
     global conf
     dl = []
     print conf["shows"]
@@ -49,6 +54,9 @@ def get_backlog():
     return dl
 
 def download_shows(backlog):
+    """
+    Download specific shows from a list.
+    """
     global conf
     for ep in backlog:
         filename = ep.split("/")[-1]
@@ -56,6 +64,9 @@ def download_shows(backlog):
         urllib.urlretrieve(ep, conf["directory"] + filename)
 
 def update_config():
+    """
+    Update last downloaded dates in the config file.
+    """
     global conf
     for name, info in conf["shows"].iteritems():
         info["last-dl"] = date.today()
