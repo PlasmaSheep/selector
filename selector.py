@@ -7,7 +7,6 @@ file.
 
 import yaml
 import urllib
-import sys
 import re
 from datetime import date
 
@@ -73,7 +72,7 @@ def update_config():
     f = file(config_file, "w")
     yaml.dump(conf, f, default_flow_style=False)
 
-def main(argv):
+def main():
     global conf;
     conf = open_config()
     backlog = get_backlog()
@@ -82,4 +81,4 @@ def main(argv):
         update_config()
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
