@@ -11,7 +11,7 @@ import urllib
 import re
 from datetime import date
 
-config_file = "./config.yaml"
+config_file = "./config.yaml" #All the user has to bother with here
 conf = []
 track_re = "http://[a-z/.]+/[a-zA-Z]+[0-9][0-9][0-9][0-9][0-9][0-9].mp3"
 rinse_url = "http://rinse.fm/podcasts/?showID="
