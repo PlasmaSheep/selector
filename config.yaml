@@ -1,0 +1,10 @@
+%YAML 1.2
+---
+directory: /tmp/
+shows:
+  Vivek:
+    id: 5666
+    last-dl:
+  Hessle Audio:
+    id: 260
+    last-dl:
