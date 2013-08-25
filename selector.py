@@ -23,10 +23,16 @@ def open_config():
     """
     global config_file
     conf = yaml.safe_load(open(config_file))
-    if conf["directory"][-1] != "/":
-        conf["directory"] = conf["directory"] + "/"
     return conf
 
+def make_path(*dirs):
+    path = ""
+    for dir in dirs:
+        path = path + dir
+        if(dir[-1] != "/"):
+            path = path + "/"
+    return path
+        
 def get_url_date(url):
     """
     Get a date object from a rinse podcast url.
@@ -41,7 +47,7 @@ def get_backlog():
     Get a list of urls of shows that have not yet been downloaded.
     """
     global conf
-    dl = []
+    dl = {} #{"dir1": ["url1", "url2"]}
     for name, info in conf["shows"].iteritems():
         print("Show: " + name)
         all_eps = [];
@@ -52,8 +58,10 @@ def get_backlog():
         all_eps = list(set(all_eps))
         for ep in all_eps:
             if(get_url_date(ep) > info["last-dl"] or info["last-dl"] == None):
+                if not name in dl:
+                    dl[name] = []
                 print("Found new episode: " + ep)
-                dl.append(ep);
+                dl[name].append(ep);
     return dl
 
 def download_shows(backlog):
@@ -61,10 +69,15 @@ def download_shows(backlog):
     Download specific shows from a list.
     """
     global conf
-    for ep in backlog:
-        filename = ep.split("/")[-1]
-        print("Downloading " + ep + " to " + conf["directory"] + filename)
-        urllib.urlretrieve(ep, conf["directory"] + filename)
+    for show, eps in backlog.items():
+        for ep in eps:
+            filename = ep.split("/")[-1]
+            dest = make_path(conf["directory"]) + filename
+            if "dir" in conf["shows"][show]:
+                dest = make_path(conf["directory"],
+                    conf["shows"][show]["dir"]) + filename
+            print("Downloading " + ep + " to " + dest)
+            urllib.urlretrieve(ep, dest)
 
 def update_config():
     """
