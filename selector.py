@@ -1,3 +1,4 @@
+#!/usr/bin/python2.7
 """
 Selector: A rinse.fm autodownloader
 
@@ -21,7 +22,10 @@ def open_config():
     Load the pyyaml config file.
     """
     global config_file
-    return yaml.safe_load(open(config_file))
+    conf = yaml.safe_load(open(config_file))
+    if conf["directory"][-1] != "/":
+        conf["directory"] = conf["directory"] + "/"
+    return conf
 
 def get_url_date(url):
     """
@@ -38,7 +42,6 @@ def get_backlog():
     """
     global conf
     dl = []
-    print conf["shows"]
     for name, info in conf["shows"].iteritems():
         print("Show: " + name)
         all_eps = [];
@@ -48,7 +51,7 @@ def get_backlog():
                 all_eps.extend(re.findall(track_re, line))
         all_eps = list(set(all_eps))
         for ep in all_eps:
-            if(get_url_date(ep) > info["last-dl"] || info["last-dl"] == None):
+            if(get_url_date(ep) > info["last-dl"] or info["last-dl"] == None):
                 print("Found new episode: " + ep)
                 dl.append(ep);
     return dl
@@ -60,7 +63,7 @@ def download_shows(backlog):
     global conf
     for ep in backlog:
         filename = ep.split("/")[-1]
-        print("Downloading " + filename + " to " + conf["directory"])
+        print("Downloading " + ep + " to " + conf["directory"] + filename)
         urllib.urlretrieve(ep, conf["directory"] + filename)
 
 def update_config():
@@ -71,7 +74,7 @@ def update_config():
     for name, info in conf["shows"].iteritems():
         info["last-dl"] = date.today()
     f = file(config_file, "w")
-    f.write("%YAML 1.2\n---")
+    f.write("%YAML 1.2\n---\n")
     yaml.dump(conf, f, default_flow_style=False)
 
 def main():
