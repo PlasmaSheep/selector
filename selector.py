@@ -21,9 +21,8 @@ def open_config():
     """
     Load the pyyaml config file.
     """
-    global config_file
+    global conf
     conf = yaml.safe_load(open(config_file))
-    return conf
 
 def make_path(*dirs):
     path = ""
@@ -46,7 +45,6 @@ def get_backlog():
     """
     Get a list of urls of shows that have not yet been downloaded.
     """
-    global conf
     dl = {} #{"dir1": ["url1", "url2"]}
     for name, info in conf["shows"].iteritems():
         print("Show: " + name)
@@ -68,7 +66,6 @@ def download_shows(backlog):
     """
     Download specific shows from a list.
     """
-    global conf
     for show, eps in backlog.items():
         for ep in eps:
             filename = ep.split("/")[-1]
@@ -83,7 +80,6 @@ def update_config():
     """
     Update last downloaded dates in the config file.
     """
-    global conf
     for name, info in conf["shows"].iteritems():
         info["last-dl"] = date.today()
     f = file(config_file, "w")
@@ -91,8 +87,7 @@ def update_config():
     yaml.dump(conf, f, default_flow_style=False)
 
 def main():
-    global conf;
-    conf = open_config()
+    open_config()
     backlog = get_backlog()
     if(len(backlog) > 0):
         download_shows(backlog)
