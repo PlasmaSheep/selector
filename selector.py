@@ -35,10 +35,7 @@ def get_url_date(url):
     """
     Get a date object from a rinse podcast url.
     """
-    year = 2000 + int(url[-6:-4])
-    month = int(url[-8:-6])
-    day = int(url[-10:-8])
-    return date(year, month, day)
+    return date(2000 + int(url[-6:-4]), int(url[-8:-6]), int(url[-10:-8]))
 
 def get_backlog():
     """
