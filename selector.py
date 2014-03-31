@@ -12,16 +12,16 @@ import urllib
 import re
 from datetime import date
 
-config_file = "./config.yaml" #All the user has to bother with here
-track_re = "http://[a-z/.]+/[a-zA-Z]+[0-9][0-9][0-9][0-9][0-9][0-9].mp3"
-rinse_url = "http://rinse.fm/podcasts/?showID="
+CONFIG_FILE = "./config.yaml" #All the user has to bother with here
+TRACK_RE = "http://[a-z/.]+/[a-zA-Z]+[0-9][0-9][0-9][0-9][0-9][0-9].mp3"
+RINSE_URL = "http://rinse.fm/podcasts/?showID="
 
 def open_config():
     """
     Load the pyyaml config file.
     """
     global conf
-    conf = yaml.safe_load(open(config_file))
+    conf = yaml.safe_load(open(CONFIG_FILE))
 
 def make_path(*dirs):
     path = ""
@@ -45,9 +45,9 @@ def get_backlog():
     for name, info in conf["shows"].iteritems():
         print("Show: " + name)
         all_eps = [];
-        f = urllib.urlopen(rinse_url + str(info["id"]))
+        f = urllib.urlopen(RINSE_URL + str(info["id"]))
         for line in f:
-            if re.search(track_re, line):
+            if re.search(TRACK_RE, line):
                 all_eps.extend(re.findall(track_re, line))
         all_eps = list(set(all_eps))
         for ep in all_eps:
