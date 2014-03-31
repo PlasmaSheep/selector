@@ -7,6 +7,7 @@ in question, then downloads new shows to a directory specified in the config
 file.
 """
 
+import os
 import yaml
 import urllib
 import re
@@ -16,14 +17,6 @@ CONFIG_FILE = "./config.yaml" #All the user has to bother with here
 TRACK_RE = "http://[a-z/.]+/[a-zA-Z]+[0-9][0-9][0-9][0-9][0-9][0-9].mp3"
 RINSE_URL = "http://rinse.fm/podcasts/?showID="
 CONFIG = yaml.safe_load(open(CONFIG_FILE))
-
-def make_path(*dirs):
-    path = ""
-    for dirname in dirs:
-        path = path + dirname
-        if dirname[-1] != "/":
-            path = path + "/"
-    return path
 
 def get_url_date(url):
     """
@@ -59,10 +52,10 @@ def download_shows(backlog):
     for show, eps in backlog.items():
         for ep in eps:
             filename = ep.split("/")[-1]
-            dest = make_path(CONFIG["directory"]) + filename
+            dest = os.path.join(CONFIG["directory"], filename)
             if "dir" in CONFIG["shows"][show]:
-                dest = make_path(CONFIG["directory"],
-                    CONFIG["shows"][show]["dir"]) + filename
+                dest = os.path.join(CONFIG["directory"],
+                    CONFIG["shows"][show]["dir"], filename)
             print("Downloading " + ep + " to " + dest)
             urllib.urlretrieve(ep, dest)
 
