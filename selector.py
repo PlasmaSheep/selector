@@ -7,11 +7,11 @@ in question, then downloads new shows to a directory specified in the config
 file.
 """
 
-import os
-import yaml
-import urllib
-import re
 from datetime import date
+import os
+import re
+import urllib
+import yaml
 
 CONFIG_FILE = "./config.yaml" #All the user has to bother with here
 
@@ -32,11 +32,14 @@ class Selector(object):
         for name, info in self.config["shows"].iteritems():
             print("Show: " + name)
             all_eps = []
-            f = urllib.urlopen(RINSE_URL + str(info["id"]))
-            for line in f:
-                if re.search(TRACK_RE, line):
-                    all_eps.extend(re.findall(TRACK_RE, line))
+
+            with urllib.urlopen(RINSE_URL + str(info["id"])) as f:
+                for line in f:
+                    if re.search(TRACK_RE, line):
+                        all_eps.extend(re.findall(TRACK_RE, line))
+
             all_eps = list(set(all_eps))
+
             for ep in all_eps:
                 if (get_url_date(ep) > info["last-dl"] or
                     info["last-dl"] == None):
@@ -44,6 +47,7 @@ class Selector(object):
                         dl_list[name] = []
                     print("Found new episode: " + ep)
                     dl_list[name].append(ep)
+
         return dl_list
 
     def download_shows(self, backlog):
@@ -56,9 +60,11 @@ class Selector(object):
             for ep in eps:
                 filename = ep.split("/")[-1]
                 dest = os.path.join(self.config["directory"], filename)
+
                 if "dir" in self.config["shows"][show]:
                     dest = os.path.join(self.config["directory"],
                         self.config["shows"][show]["dir"], filename)
+
                 print("Downloading " + ep + " to " + dest)
                 urllib.urlretrieve(ep, dest)
 
@@ -68,8 +74,10 @@ class Selector(object):
         """
         for info in self.config["shows"].values():
             info["last-dl"] = date.today()
-        f = file(self.config, "w")
-        f.write("%YAML 1.2\n---\n")
+
+        with open(self.config, "w") as f:
+            f.write("%YAML 1.2\n---\n")
+
         yaml.dump(self.config, f, default_flow_style=False)
 
 def get_url_date(url):
@@ -84,6 +92,7 @@ def main():
     """
     selector = Selector()
     backlog = selector.get_backlog()
+
     if len(backlog) > 0:
         selector.download_shows(backlog)
         selector.update_config()
