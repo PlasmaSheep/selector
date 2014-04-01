@@ -10,7 +10,7 @@ file.
 from datetime import date
 import os
 import re
-import urllib
+import urllib #TODO: requests
 import yaml
 
 CONFIG_FILE = "./config.yaml" #All the user has to bother with here
