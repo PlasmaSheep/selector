@@ -29,6 +29,7 @@ class Selector(object):
         Get a list of urls of shows that have not yet been downloaded.
         """
         dl_list = {} #{"dir1": ["url1", "url2"]}
+
         for name, info in self.config["shows"].iteritems():
             print("Show: " + name)
             all_eps = []
