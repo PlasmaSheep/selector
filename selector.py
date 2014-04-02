@@ -34,10 +34,10 @@ class Selector(object):
             print("Show: " + name)
             all_eps = []
 
-            with urllib.urlopen(RINSE_URL + str(info["id"])) as f:
-                for line in f:
-                    if re.search(TRACK_RE, line):
-                        all_eps.extend(re.findall(TRACK_RE, line))
+            f = urllib.urlopen(RINSE_URL + str(info["id"]))
+            for line in f:
+                if re.search(TRACK_RE, line):
+                    all_eps.extend(re.findall(TRACK_RE, line))
 
             all_eps = list(set(all_eps))
 
@@ -76,10 +76,9 @@ class Selector(object):
         for info in self.config["shows"].values():
             info["last-dl"] = date.today()
 
-        with open(self.config, "w") as f:
+        with open(CONFIG_FILE, "w") as f:
             f.write("%YAML 1.2\n---\n")
-
-        yaml.dump(self.config, f, default_flow_style=False)
+            yaml.dump(self.config, f, default_flow_style=False)
 
 def get_url_date(url):
     """
