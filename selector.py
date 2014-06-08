@@ -21,15 +21,14 @@ RINSE_URL = "http://rinse.fm/podcasts/?showID="
 class Selector(object):
     """Handle parsing and downloading files.
     """
-    def __init__(self):
-        self.config = yaml.safe_load(open(CONFIG_FILE))
+    def __init__(self, config_file=CONFIG_FILE):
+        self.config = yaml.safe_load(open(config_file))
 
     def get_backlog(self):
         """
         Get a list of urls of shows that have not yet been downloaded.
         """
         dl_list = {} #{"dir1": ["url1", "url2"]}
-
         for name, info in self.config["shows"].iteritems():
             print("Show: " + name)
             all_eps = []
@@ -39,7 +38,7 @@ class Selector(object):
                 if re.search(TRACK_RE, line):
                     all_eps.extend(re.findall(TRACK_RE, line))
 
-            all_eps = list(set(all_eps))
+            all_eps = set(all_eps)
 
             for ep in all_eps:
                 if (get_url_date(ep) > info["last-dl"] or
@@ -99,3 +98,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
