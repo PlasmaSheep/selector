@@ -1,7 +1,6 @@
 """
 Tests for the selector module.
 """
-
 from datetime import date
 import mock
 import os
@@ -62,6 +61,80 @@ class TestSelector(unittest.TestCase):
 
         mock_urllib.urlopen.assert_called_once_with(selector.RINSE_URL + \
             str(self.config["shows"]["FooBar"]["id"]))
+
+    @mock.patch("selector.urllib", autospec=True)
+    def test_download_shows(self, mock_urllib):
+        """Test the download_shows method.
+        """
+        mock_config = {
+            "shows": {
+                "show1": {
+                    "dir": "home/foo",
+                },
+                "show2": {},
+            },
+            "directory": "/foo",
+        }
+
+        backlog = {
+            "show1": ["foobar.com/foo", "barqux.com/bar"],
+            "show2": ["barfoo.com/foo1", "quxfoo.com/bar2"]
+        }
+
+        expected_downloads = [
+            mock.call("foobar.com/foo", "/foo/home/foo/foo"),
+            mock.call("barqux.com/bar", "/foo/home/foo/bar"),
+            mock.call("barfoo.com/foo1", "/foo/foo1"),
+            mock.call("quxfoo.com/bar2", "/foo/bar2"),
+        ]
+
+        self.selector.config = mock_config
+        self.selector.download_shows(backlog)
+
+        mock_urllib.urlretrieve.assert_has_calls(expected_downloads)
+
+    @mock.patch("selector.yaml", autospec=True)
+    def test_update_config(self, mock_yaml):
+        """Test update_config.
+        """
+        mock_config = {
+            "shows": {
+                "show1": {
+                    "last-dl": date(200, 12, 12) # Do not test before year 200!
+                },
+                "show2": {},
+            },
+            "directory": "/foo",
+        }
+
+        written_config = mock_config.copy()
+        written_config["shows"]["show1"]["last_dl"] = date.today()
+        written_config["shows"]["show2"]["last_dl"] = date.today()
+
+        self.selector.config = mock_config
+        mock_file = mock.mock_open()
+        mock_yaml.return_value = "foobar"
+
+        with mock.patch("selector.open", mock_file, create=True):
+            self.selector.update_config()
+
+        mock_yaml.dump.assert_called_once_with(written_config,
+            mock_file.return_value, default_flow_style=False)
+        mock_file.return_value.write.assert_called_once_with("%YAML 1.2\n---\n")
+
+    @mock.patch("selector.Selector", autospec=True)
+    def test_main(self, mock_selector):
+        """Test the main method.
+        """
+        mock_backlog = range(0, 4)
+        mock_selector.return_value.get_backlog.return_value = mock_backlog
+
+        selector.main()
+
+        mock_selector.assert_called_once_with()
+        mock_selector.return_value.get_backlog.assert_called_once_with()
+        mock_selector.return_value.download_shows.assert_called_once_with(mock_backlog)
+        mock_selector.return_value.update_config.assert_called_once_with()
 
 class TestHelperMethods(unittest.TestCase):
     """Test the helper methods in the selector module.
