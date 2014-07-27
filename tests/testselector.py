@@ -2,7 +2,7 @@
 Tests for the selector module.
 """
 from datetime import date
-import mock
+from unittest.mock import patch, MagicMock, mock_open, call
 import os
 import tempfile
 import unittest
@@ -23,7 +23,7 @@ class TestSelector(unittest.TestCase):
                 "FooBar": {
                     "dir": "FooBar",
                     "id": 113,
-                    "last-dl": date(2010, 01, 01)
+                    "last-dl": date(2010, 1, 1)
                 }
             }
         }
@@ -33,12 +33,12 @@ class TestSelector(unittest.TestCase):
 
         self.selector = selector.Selector(mock_config_file[1])
 
-    @mock.patch("selector.urllib", autospec=True)
+    @patch("selector.urllib.request", autospec=True)
     def test_get_backlog(self, mock_urllib):
         """Test the get_backlog method.
         """
 
-        mock_file_iterator = mock.MagicMock()
+        mock_file_iterator = MagicMock()
         mock_file_iterator.__iter__.return_value = iter([
             "foobar",
             "foobaz",
@@ -62,7 +62,7 @@ class TestSelector(unittest.TestCase):
         mock_urllib.urlopen.assert_called_once_with(selector.RINSE_URL + \
             str(self.config["shows"]["FooBar"]["id"]))
 
-    @mock.patch("selector.urllib", autospec=True)
+    @patch("selector.urllib.request", autospec=True)
     def test_download_shows(self, mock_urllib):
         """Test the download_shows method.
         """
@@ -82,18 +82,18 @@ class TestSelector(unittest.TestCase):
         }
 
         expected_downloads = [
-            mock.call("foobar.com/foo", "/foo/home/foo/foo"),
-            mock.call("barqux.com/bar", "/foo/home/foo/bar"),
-            mock.call("barfoo.com/foo1", "/foo/foo1"),
-            mock.call("quxfoo.com/bar2", "/foo/bar2"),
+            call("foobar.com/foo", "/foo/home/foo/foo"),
+            call("barqux.com/bar", "/foo/home/foo/bar"),
+            call("barfoo.com/foo1", "/foo/foo1"),
+            call("quxfoo.com/bar2", "/foo/bar2"),
         ]
 
         self.selector.config = mock_config
         self.selector.download_shows(backlog)
 
-        mock_urllib.urlretrieve.assert_has_calls(expected_downloads)
+        mock_urllib.urlretrieve.assert_has_calls(expected_downloads, True)
 
-    @mock.patch("selector.yaml", autospec=True)
+    @patch("selector.yaml", autospec=True)
     def test_update_config(self, mock_yaml):
         """Test update_config.
         """
@@ -112,21 +112,21 @@ class TestSelector(unittest.TestCase):
         written_config["shows"]["show2"]["last_dl"] = date.today()
 
         self.selector.config = mock_config
-        mock_file = mock.mock_open()
+        mock_file = mock_open()
         mock_yaml.return_value = "foobar"
 
-        with mock.patch("selector.open", mock_file, create=True):
+        with patch("selector.open", mock_file, create=True):
             self.selector.update_config()
 
         mock_yaml.dump.assert_called_once_with(written_config,
             mock_file.return_value, default_flow_style=False)
         mock_file.return_value.write.assert_called_once_with("%YAML 1.2\n---\n")
 
-    @mock.patch("selector.Selector", autospec=True)
+    @patch("selector.Selector", autospec=True)
     def test_main(self, mock_selector):
         """Test the main method.
         """
-        mock_backlog = range(0, 4)
+        mock_backlog = list(range(0, 4))
         mock_selector.return_value.get_backlog.return_value = mock_backlog
 
         selector.main()
@@ -144,7 +144,7 @@ class TestHelperMethods(unittest.TestCase):
         """Test the get_url_data method.
         """
         url = "http://podcast.dgen.net/rinsefm/podcast/NType310314.mp3"
-        key = date(2014, 03, 31)
+        key = date(2014, 3, 31)
 
-        self.failUnless(selector.get_url_date(url) == key)
+        assert selector.get_url_date(url) == key
 
