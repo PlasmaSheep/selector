@@ -6,7 +6,6 @@ This script reads a config file, goes to the rinse website to look up the shows
 in question, then downloads new shows to a directory specified in the config
 file.
 """
-
 from datetime import date
 import os
 import re
@@ -28,7 +27,7 @@ class Selector(object):
         """
         Get a list of urls of shows that have not yet been downloaded.
         """
-        dl_list = {} #{"dir1": ["url1", "url2"]}
+        dl_list = {} #{"showname": ["url1", "url2"]}
         for name, info in self.config["shows"].iteritems():
             print("Show: " + name)
             all_eps = []
