@@ -9,7 +9,7 @@ file.
 from datetime import date
 import os
 import re
-import urllib #TODO: requests
+import urllib.request
 import yaml
 
 CONFIG_FILE = "./config.yaml" #All the user has to bother with here
@@ -28,11 +28,11 @@ class Selector(object):
         Get a list of urls of shows that have not yet been downloaded.
         """
         dl_list = {} #{"showname": ["url1", "url2"]}
-        for name, info in self.config["shows"].iteritems():
+        for name, info in self.config["shows"].items():
             print("Show: " + name)
             all_eps = []
 
-            f = urllib.urlopen(RINSE_URL + str(info["id"]))
+            f = urllib.request.urlopen(RINSE_URL + str(info["id"]))
             for line in f:
                 if re.search(TRACK_RE, line):
                     all_eps.extend(re.findall(TRACK_RE, line))
@@ -59,13 +59,12 @@ class Selector(object):
             for ep in eps:
                 filename = ep.split("/")[-1]
                 dest = os.path.join(self.config["directory"], filename)
-
                 if "dir" in self.config["shows"][show]:
                     dest = os.path.join(self.config["directory"],
                         self.config["shows"][show]["dir"], filename)
 
                 print("Downloading " + ep + " to " + dest)
-                urllib.urlretrieve(ep, dest)
+                urllib.request.urlretrieve(ep, dest)
 
     def update_config(self):
         """
