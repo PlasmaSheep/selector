@@ -11,7 +11,7 @@ Dependencies
 Installation
 ------------
 
-`pip install PyYAML`
+    pip install -r requirements.txt
 
 Use
 ---
@@ -42,3 +42,12 @@ Rinse website. The name of each node will be used as the name of the show. If
 `dir` is present, then podcasts from this show will be downloaded to
 `directory/dir`. If `last-dl` is present, only shows newer than this date
 (YYYY-MM-DD) will be downloaded.
+
+Testing
+-------
+
+If you'd like to run unit tests:
+
+    pip install -r requirements-testing.txt
+    nosetests
+
