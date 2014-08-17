@@ -40,18 +40,18 @@ class TestSelector(unittest.TestCase):
 
         mock_file_iterator = MagicMock()
         mock_file_iterator.__iter__.return_value = iter([
-            "foobar",
-            "foobaz",
-            ('<a href='
-                '"http://podcast.dgen.net/rinsefm/podcast/FooBarBaz131211.mp3"'
-                '></a>'),
-            ('<a href="http://podcast.dgen.net/rinsefm/podcast/'
-                'FooBarBaz090101.mp3"'
-                'download="http://podcast.dgen.net/rinsefm/podcast/'
-                'FooBarBaz090101.mp3" '
-                'target="_blank" class="bglavender"'
-                'title="Right Click and Save As to Download">&nbsp;</a>'
-            )])
+            b"foobar",
+            b"foobaz",
+            (b'<a href='
+                b'"http://podcast.dgen.net/rinsefm/podcast/FooBarBaz131211.mp3"'
+                b'></a>'),
+            (b'<a href="http://podcast.dgen.net/rinsefm/podcast/'
+                b'FooBarBaz090101.mp3"'
+                b'download="http://podcast.dgen.net/rinsefm/podcast/'
+                b'FooBarBaz090101.mp3" '
+                b'target="_blank" class="bglavender"'
+                b'title="Right Click and Save As to Download">&nbsp;</a>')])
+
         mock_urllib.urlopen.return_value = mock_file_iterator
         results = self.selector.get_backlog()
 
