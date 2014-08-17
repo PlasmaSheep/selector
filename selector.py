@@ -34,6 +34,7 @@ class Selector(object):
 
             f = urllib.request.urlopen(RINSE_URL + str(info["id"]))
             for line in f:
+                line = line.decode("utf-8")
                 if re.search(TRACK_RE, line):
                     all_eps.extend(re.findall(TRACK_RE, line))
 
