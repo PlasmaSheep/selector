@@ -8,7 +8,7 @@ import tempfile
 import unittest
 import yaml
 
-import selector
+from selector import selector
 
 class TestSelector(unittest.TestCase):
     """Test the methods in the Selector class.
@@ -33,7 +33,7 @@ class TestSelector(unittest.TestCase):
 
         self.selector = selector.Selector(mock_config_file[1])
 
-    @patch("selector.urllib.request", autospec=True)
+    @patch("selector.selector.urllib.request", autospec=True)
     def test_get_backlog(self, mock_urllib):
         """Test the get_backlog method.
         """
@@ -62,7 +62,7 @@ class TestSelector(unittest.TestCase):
         mock_urllib.urlopen.assert_called_once_with(selector.RINSE_URL + \
             str(self.config["shows"]["FooBar"]["id"]))
 
-    @patch("selector.urllib.request", autospec=True)
+    @patch("selector.selector.urllib.request", autospec=True)
     def test_download_shows(self, mock_urllib):
         """Test the download_shows method.
         """
@@ -93,7 +93,7 @@ class TestSelector(unittest.TestCase):
 
         mock_urllib.urlretrieve.assert_has_calls(expected_downloads, True)
 
-    @patch("selector.yaml", autospec=True)
+    @patch("selector.selector.yaml", autospec=True)
     def test_update_config(self, mock_yaml):
         """Test update_config.
         """
@@ -115,14 +115,14 @@ class TestSelector(unittest.TestCase):
         mock_file = mock_open()
         mock_yaml.return_value = "foobar"
 
-        with patch("selector.open", mock_file, create=True):
+        with patch("selector.selector.open", mock_file, create=True):
             self.selector.update_config()
 
         mock_yaml.dump.assert_called_once_with(written_config,
             mock_file.return_value, default_flow_style=False)
         mock_file.return_value.write.assert_called_once_with("%YAML 1.2\n---\n")
 
-    @patch("selector.Selector", autospec=True)
+    @patch("selector.selector.Selector", autospec=True)
     def test_main(self, mock_selector):
         """Test the main method.
         """
