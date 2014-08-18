@@ -1,4 +1,7 @@
 venv
 .coverage
 config.yaml
+build/
+dist/
+*.egg-info/
 

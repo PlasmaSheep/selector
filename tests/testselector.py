@@ -7,6 +7,7 @@ import os
 import tempfile
 import unittest
 import yaml
+import pdb
 
 from selector import selector
 
@@ -133,7 +134,7 @@ class TestSelector(unittest.TestCase):
         mock_exists.return_value = True
 
         selector.main()
-
+        pdb.set_trace()
         mock_selector.assert_called_once_with(selector.CONFIGS[0])
         mock_selector.return_value.get_backlog.assert_called_once_with()
         mock_selector.return_value.download_shows.assert_called_once_with(mock_backlog)
