@@ -11,8 +11,10 @@ import os
 import re
 import urllib.request
 import yaml
+import sys
 
-CONFIG_FILE = "./config.yaml" #All the user has to bother with here
+CONFIGS = [os.path.join(os.path.expanduser("~"), ".selector.yaml"),
+    os.path.join(os.path.expanduser("~"), "config", "selector.yaml")]
 
 TRACK_RE = "http://[a-z/.]+/[a-zA-Z]+[0-9][0-9][0-9][0-9][0-9][0-9].mp3"
 RINSE_URL = "http://rinse.fm/podcasts/?showID="
@@ -20,7 +22,8 @@ RINSE_URL = "http://rinse.fm/podcasts/?showID="
 class Selector(object):
     """Handle parsing and downloading files.
     """
-    def __init__(self, config_file=CONFIG_FILE):
+    def __init__(self, config_file):
+        self.config_file = config_file
         self.config = yaml.safe_load(open(config_file))
 
     def get_backlog(self):
@@ -74,7 +77,7 @@ class Selector(object):
         for info in self.config["shows"].values():
             info["last-dl"] = date.today()
 
-        with open(CONFIG_FILE, "w") as f:
+        with open(self.config_file, "w") as f:
             f.write("%YAML 1.2\n---\n")
             yaml.dump(self.config, f, default_flow_style=False)
 
@@ -85,10 +88,26 @@ def get_url_date(url):
     return date(2000 + int(url[-6:-4]), int(url[-8:-6]), int(url[-10:-8]))
 
 def main():
+    """Start the script.
+
+    Selector looks for configurations in the following directories:
+
+    1. ``~/.selector.yaml``
+    2. ``~/.config/selector.yaml``
+
+    It exits if none are found.
     """
-    Start the script.
-    """
-    selector = Selector()
+    config_path = ""
+    for config in CONFIGS:
+        if os.path.exists(config):
+            config_path = config
+            break
+
+    if not config_path:
+        print("No config file found.")
+        sys.exit(1)
+
+    selector = Selector(config_path)
     backlog = selector.get_backlog()
 
     if len(backlog) > 0:

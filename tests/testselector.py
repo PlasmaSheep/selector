@@ -123,15 +123,18 @@ class TestSelector(unittest.TestCase):
         mock_file.return_value.write.assert_called_once_with("%YAML 1.2\n---\n")
 
     @patch("selector.selector.Selector", autospec=True)
-    def test_main(self, mock_selector):
+    @patch("selector.selector.os.path.exists", autospec=True)
+    def test_main(self, mock_exists, mock_selector):
         """Test the main method.
         """
         mock_backlog = list(range(0, 4))
         mock_selector.return_value.get_backlog.return_value = mock_backlog
 
+        mock_exists.return_value = True
+
         selector.main()
 
-        mock_selector.assert_called_once_with()
+        mock_selector.assert_called_once_with(selector.CONFIGS[0])
         mock_selector.return_value.get_backlog.assert_called_once_with()
         mock_selector.return_value.download_shows.assert_called_once_with(mock_backlog)
         mock_selector.return_value.update_config.assert_called_once_with()
